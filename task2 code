@@ -1,0 +1,48 @@
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+# --- Load Dataset ---
+file_path = r"C:\Users\vaish\OneDrive\Desktop\Pythonlearn\prodigy.task\housing.csv"
+data = pd.read_csv(file_path)
+
+# --- Display Columns ---
+print("📋 Columns in dataset:", data.columns.tolist())
+
+# --- Define Features and Target ---
+X = data[['area', 'bedrooms', 'bathrooms']]
+y = data['price']
+
+# --- Train/Test Split ---
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# --- Train Linear Regression Model ---
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# --- Evaluate Model ---
+y_pred = model.predict(X_test)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+print(f"\n📈 Linear Regression RMSE: {rmse:.2f}")
+
+# --- Coefficients ---
+print("\n📊 Model Coefficients:")
+for feature, coef in zip(X.columns, model.coef_):
+    print(f"{feature}: {coef:.2f}")
+print(f"Intercept: {model.intercept_:.2f}")
+
+# --- Predict Custom Input ---
+print("\n🏠 Predict House Price")
+try:
+    square_feet = float(input("Enter square footage: "))
+    bedrooms = int(input("Enter number of bedrooms: "))
+    bathrooms = int(input("Enter number of bathrooms: "))
+
+    custom_input = pd.DataFrame([[square_feet, bedrooms, bathrooms]], columns=['area', 'bedrooms', 'bathrooms'])
+    predicted_price = model.predict(custom_input)[0]
+
+    print(f"💰 Predicted House Price: ₹{predicted_price:,.2f}")
+except Exception as e:
+    print(f"⚠️ Invalid input. Please enter valid numerical values.\nDetails: {e}")
